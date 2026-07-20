@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="icon" type="image/webp" href="locantof1.webp">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .main-wrapper {
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
+            background-color: #000;
+        }
+
+        .bg-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .bg-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .bg-slide.active {
+            opacity: 1;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 2;
+        }
+        .content-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 15px;
+        }
+        .logo-container {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+        .logo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+        }
+        
+        .powered-by {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .locanto-text {
+            font-weight: 800;
+            font-style: italic;
+        }
+        .lo-dark-blue { color: #1d4fa4; }
+        .can-vibrant-orange { color: #f26522; }
+        .to-reddish-orange { color: #c64416; }
+
+        .text-line {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            margin: 8px 0;
+            opacity: 0;
+        }
+        .text-many-holes {
+            font-size: clamp(3rem, 12vw, 4.5rem);
+            color: #fff;
+            text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055, 0 0 40px #ff0055;
+        }
+        .slide-from-left {
+            animation: slideLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .text-waiting {
+            font-size: clamp(2.2rem, 8vw, 3.5rem);
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+        .slide-from-right {
+            animation: slideRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .text-free {
+            font-size: clamp(3.5rem, 14vw, 5.5rem);
+            color: #39ff14;
+            text-shadow: 0 0 15px #39ff14, 0 0 30px #39ff14, 0 0 60px #39ff14;
+            margin-bottom: 15px;
+        }
+        .slide-from-bottom {
+            animation: slideBottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+                        megaShake 0.15s infinite alternate linear;
+            animation-delay: 0s, 0.4s;
+        }
+
+        .cta-button {
+            display: none;
+            text-decoration: none;
+            padding: 15px 40px;
+            font-size: clamp(1.3rem, 6vw, 2rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #000;
+            background: linear-gradient(90deg, #ffea00 0%, #ffcc00 100%);
+            background-size: 200% auto;
+            border-radius: 50px;
+            box-shadow: 0 0 20px #ffcc00, inset 0 0 10px rgba(255,255,255,0.6);
+            cursor: pointer;
+            border: none;
+            outline: none;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+            width: 85%;
+        }
+        
+        .button-active {
+            display: inline-block;
+            animation: pulseNudge 1.5s infinite ease-in-out;
+        }
+
+        /* নতুন ফুল ডিসপ্লে স্ক্রিন (extra1.webp এর জন্য) */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* নতুন স্ক্রিনের কালো ঝাপসা ওভারলে */
+        .loading-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        /* প্রিমিয়াম বাফারিং অ্যানিমেশন */
+        .premium-buffer {
+            width: 70px;
+            height: 70px;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #39ff14;
+            border-top-color: #00ffff;
+            border-right-color: #ff0055;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 15px rgba(0,255,255,0.8));
+        }
+
+        /* প্রিমিয়াম বোল্ড টেক্সট স্টাইল */
+        .loading-text {
+            color: #ffffff;
+            font-size: clamp(1.5rem, 6vw, 2.3rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 0 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.6), 2px 2px 4px #000;
+        }
+
+        @keyframes slideLeft {
+            0% { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
+            100% { transform: translateX(0) skewX(0deg); opacity: 1; }
+        }
+        @keyframes slideRight {
+            0% { transform: translateX(150%) skewX(20deg); opacity: 0; }
+            100% { transform: translateX(0) skewX(0deg); opacity: 1; }
+        }
+        @keyframes slideBottom {
+            0% { transform: translateY(150%) scale(0.5); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes megaShake {
+            0% { transform: translate(2px, 1px) rotate(0deg) scale(1); }
+            20% { transform: translate(-1px, -2px) rotate(-1deg) scale(1.05); }
+            40% { transform: translate(-3px, 0px) rotate(1deg) scale(1); }
+            60% { transform: translate(0px, 2px) rotate(0deg) scale(1.05); }
+            80% { transform: translate(1px, -1px) rotate(-1deg) scale(1); }
+            100% { transform: translate(-1px, 2px) rotate(1deg) scale(1.08); }
+        }
+        @keyframes pulseNudge {
+            0% { transform: scale(1) rotate(0deg); box-shadow: 0 0 20px #ffcc00; }
+            25% { transform: scale(1.05) rotate(-1deg); }
+            50% { transform: scale(1) rotate(1deg); box-shadow: 0 0 35px #ffea00; }
+            75% { transform: scale(1.05) rotate(-1deg); }
+            100% { transform: scale(1) rotate(0deg); box-shadow: 0 0 20px #ffcc00; }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mainWrapper" class="main-wrapper">
+        <div class="bg-slider">
+            <div class="bg-slide active" style="background-image: url('ki1.webp');"></div>
+            <div class="bg-slide" style="background-image: url('ki2.webp');"></div>
+            <div class="bg-slide" style="background-image: url('ki3.webp');"></div>
+            <div class="bg-slide" style="background-image: url('ki4.webp');"></div>
+            <div class="bg-slide" style="background-image: url('ki5.webp');"></div>
+        </div>
+
+        <div class="overlay"></div>
+
+        <div class="content-container">
+            <div class="logo-container">
+                <img src="lgd1.webp" alt="Logo">
+                <div class="powered-by">
+                    Powered by 
+                    <span class="locanto-text">
+                        <span class="lo-dark-blue">L</span><span class="lo-dark-blue">o</span><span class="can-vibrant-orange">c</span><span class="can-vibrant-orange">a</span><span class="can-vibrant-orange">n</span><span class="to-reddish-orange">t</span><span class="to-reddish-orange">o</span>
+                    </span>
+                </div>
+            </div>
+
+            <h1 id="text1" class="text-line text-many-holes">Many Holes</h1>
+            <h2 id="text2" class="text-line text-waiting">Waiting For You</h2>
+            <div id="text3" class="text-line text-free">Free</div>
+            
+            <button id="ctaBtn" class="cta-button">Get Hole</button>
+        </div>
+    </div>
+
+    <!-- বাটনে ক্লিক করার পর ১ সেকেন্ডের জন্য এই স্ক্রিনটি আসবে -->
+    <div id="loadingScreen" class="loading-screen" style="background-image: url('extra1.webp');">
+        <div class="premium-buffer"></div>
+        <div class="loading-text">Now You Ready To Fuck Holes</div>
+    </div>
+
+    <script>
+        const affiliateLink = "https://dghhgdb.kftln.com/p/4ef8x";
+
+        // স্লাইডার স্ক্রিপ্ট
+        const slides = document.querySelectorAll('.bg-slide');
+        let currentSlide = 0;
+
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 1000);
+
+        window.addEventListener('load', () => {
+            const t1 = document.getElementById('text1');
+            const t2 = document.getElementById('text2');
+            const t3 = document.getElementById('text3');
+            const btn = document.getElementById('ctaBtn');
+            const loadingScreen = document.getElementById('loadingScreen');
+
+            t1.classList.add('slide-from-left');
+
+            setTimeout(() => {
+                t2.classList.add('slide-from-right');
+            }, 300);
+
+            setTimeout(() => {
+                t3.classList.add('slide-from-bottom');
+                btn.classList.add('button-active');
+            }, 600);
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // ১ সেকেন্ডের জন্য নতুন স্ক্রিনটি চালু করা হলো
+                loadingScreen.style.display = 'flex';
+
+                // ডিভাইস সিকিউরিটি ও ব্রাউজার ব্লক এড়াতে ফর্ম সাবমিশন মেথড
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = affiliateLink;
+                document.body.appendChild(form);
+
+                // ঠিক ১০০০ মিলিমেকেন্ড (১ সেকেন্ড) পর সাবমিট হয়ে যাবে
+                setTimeout(() => {
+                    form.submit();
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
